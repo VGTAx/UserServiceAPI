@@ -45,5 +45,7 @@ namespace UserServiceAPI.Models
     /// </summary>
     [JsonIgnore]
     public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
+
+    
   }
 }

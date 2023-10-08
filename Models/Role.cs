@@ -8,7 +8,7 @@ namespace UserServiceAPI.Models
   /// <summary>
   /// Represent a role
   /// </summary>
-  public class Role
+  public class Role : IComparable<Role>
   { 
     /// <summary>
     /// Role Id
@@ -26,5 +26,14 @@ namespace UserServiceAPI.Models
     /// </summary>
     [JsonIgnore]
     public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    int IComparable<Role>.CompareTo(Role? other)
+    {
+      return Id.CompareTo(other?.Id);
+    }
   }
 }
