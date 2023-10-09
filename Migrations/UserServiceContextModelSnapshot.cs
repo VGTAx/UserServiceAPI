@@ -110,7 +110,7 @@ namespace UserServiceAPI.Migrations
                         {
                             Id = 5,
                             Age = 38,
-                            Email = "p.durov@gmail.com",
+                            Email = "p.durov@telegram.com",
                             Name = "Pavel Durov"
                         },
                         new

@@ -10,8 +10,8 @@ using UserServiceAPI.Data;
 namespace UserServiceAPI.Migrations
 {
     [DbContext(typeof(UserServiceContext))]
-    [Migration("20231007213727_create_user_roles_db")]
-    partial class create_user_roles_db
+    [Migration("20231009193849_create_user_service_API_db")]
+    partial class create_user_service_API_db
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,7 +113,7 @@ namespace UserServiceAPI.Migrations
                         {
                             Id = 5,
                             Age = 38,
-                            Email = "p.durov@gmail.com",
+                            Email = "p.durov@telegram.com",
                             Name = "Pavel Durov"
                         },
                         new

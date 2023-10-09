@@ -7,7 +7,7 @@
 namespace UserServiceAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class create_user_roles_db : Migration
+    public partial class create_user_service_API_db : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
