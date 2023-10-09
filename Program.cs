@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Reflection;
 using UserServiceAPI.Data;
+using UserServiceAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,6 @@ builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddLogging(loggingBuilder =>
 {
   loggingBuilder.ClearProviders();
-  loggingBuilder.AddSerilog();
 });
 
 Log.Logger = new LoggerConfiguration()
@@ -42,7 +42,7 @@ builder.Services.AddSwaggerGen(swaggerBuilder =>
 try
 {
   var app = builder.Build();
-  
+
   Log.Information("Application built and starting...");
   // Configure the HTTP request pipeline.
   if (app.Environment.IsDevelopment())
@@ -51,7 +51,10 @@ try
     app.UseSwaggerUI();
   }
   app.UseCors();
+
   app.UseHttpsRedirection();
+
+  app.UseMiddleware<HttpLoggingMiddleware>();
 
   app.UseAuthorization();
 

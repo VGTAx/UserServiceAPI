@@ -12,26 +12,32 @@ namespace UserServiceAPI.Models
     /// Current page in pagination
     /// </summary>
     public int CurrentPage { get; set; }
+
     /// <summary>
     /// Total pages in pagination
     /// </summary>
     public int TotalPages { get; set; }
+
     /// <summary>
     /// Count entries on a page
     /// </summary>
     public int PageSize{ get; set; }
+
     /// <summary>
     /// Total number of entries
     /// </summary>
     public int CountOfRecords { get; set; }
+
     /// <summary>
     /// Presence of previous page in pagination
     /// </summary>
     public bool HasPreviousPage => CurrentPage > 1;
+
     /// <summary>
     /// 
     /// </summary>
     public bool HasNextPage => CurrentPage < TotalPages;
+
     /// <summary>
     /// Presence of next page in pagination
     /// </summary>

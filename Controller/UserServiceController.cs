@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Common;
 using UserServiceAPI.Data;
 using UserServiceAPI.DTOs;
 using UserServiceAPI.Models;
@@ -18,7 +17,6 @@ namespace UserServiceAPI.Controller
     private readonly UserServiceContext _context;
     private readonly ILogger<UserServiceController> _logger;
     private readonly IMapper _mapper;
-
     private readonly List<string> userAccessLevelList = new List<string>
       {
         "SuperAdmin",
@@ -78,6 +76,7 @@ namespace UserServiceAPI.Controller
     public async Task<IActionResult> GetUsers([FromQuery] UserFilterDto userFilterDto, string userRoleName = "", int page = 1, int pageSize = 10, string sortOrder = "IdAsc")
     {
       _logger.LogInformation($"Entering {nameof(GetUsers)} method");
+
       try
       {
         var users = await _context.Users
@@ -96,37 +95,37 @@ namespace UserServiceAPI.Controller
         if (!users.Any())
         {
           _logger.LogWarning("No users found");
-          _logger.LogInformation($"Exiting {nameof(GetUsers)} method\n");
+          _logger.LogInformation($"Exiting {nameof(GetUsers)} method");
           return NotFound("No users found.");
         }
 
         if (page < 1)
         {
           _logger.LogWarning("Page number must be 1 or greater ");
-          _logger.LogInformation($"Exiting {nameof(GetUsers)} method\n");
+          _logger.LogInformation($"Exiting {nameof(GetUsers)} method");
           return BadRequest("Page number must be 1 or greater");
         }
 
         if (pageSize < 1)
         {
           _logger.LogWarning("Page size must be 1 or greater");
-          _logger.LogInformation($"Exiting {nameof(GetUsers)} method\n");
+          _logger.LogInformation($"Exiting {nameof(GetUsers)} method");
           return BadRequest("Page size must be 1 or greater");
         }
 
-        var items = FilterEntries(users, userFilterDto, userRoleName);
-        var count = items.Count();
+        var returnUsers = FilterEntries(users, userFilterDto, userRoleName);
+        var count = returnUsers.Count;
 
-        if (!items.Any())
+        if (!returnUsers.Any())
         {
           _logger.LogWarning("No entries found matching the filter");
-          _logger.LogInformation($"Exiting {nameof(GetUsers)} method\n");
+          _logger.LogInformation($"Exiting {nameof(GetUsers)} method");
           return NotFound("No entries found matching the filter");
         }
 
-        items = SortEntries(items, sortOrder);
+        returnUsers = SortEntries(returnUsers, sortOrder);
 
-        items = items.Skip((page - 1) * pageSize)
+        returnUsers = returnUsers.Skip((page - 1) * pageSize)
                   .Take(pageSize)
                   .ToList();
 
@@ -135,17 +134,17 @@ namespace UserServiceAPI.Controller
         if (pages.TotalPages < page)
         {
           _logger.LogWarning("Page was not found");
-          _logger.LogInformation($"Exiting {nameof(GetUsers)} method\n");
+          _logger.LogInformation($"Exiting {nameof(GetUsers)} method");
           return NotFound("Page was not found");
         }
 
-        var getUserPages = new UsersPaginationData(items, pages);
+        var getUserPages = new UsersPaginationData(returnUsers, pages);
 
-        _logger.LogInformation($"Users were got");
-        _logger.LogInformation($"Exiting {nameof(GetUsers)} method\n");
+        _logger.LogInformation("Users were got. Users count: {count}", returnUsers.Count);
+        _logger.LogInformation($"Exiting {nameof(GetUsers)} method");
         return Ok(getUserPages);
       }
-      catch (DbException)
+      catch (Exception)
       {
         return StatusCode(500, "Internal server error.");
       }
@@ -163,12 +162,13 @@ namespace UserServiceAPI.Controller
     public IActionResult GetUser(int userId)
     {
       _logger.LogInformation($"Entering {nameof(GetUser)} method");
+
       try
       {
         if (!IsUserExist(userId))
         {
           _logger.LogWarning("User with ID: {userId} not found", userId);
-          _logger.LogInformation($"Exiting {nameof(GetUser)} method\n");
+          _logger.LogInformation($"Exiting {nameof(GetUser)} method");
           return NotFound($"User with ID: {userId} not found");
         }
         var user = _context.Users
@@ -186,7 +186,7 @@ namespace UserServiceAPI.Controller
               });
 
         _logger.LogInformation("Return user with roles. UserID: {userId}", userId);
-        _logger.LogInformation($"Exiting {nameof(GetUser)} method\n");
+        _logger.LogInformation($"Exiting {nameof(GetUser)} method");
         return Ok(user);
       }
       catch (Exception)
@@ -214,20 +214,21 @@ namespace UserServiceAPI.Controller
     [HttpPost("CreateUser", Name = "CreateUser")]
     public async Task<IActionResult> CreateUser([FromBody] UserCreateDto userCreateDto)
     {
-      _logger.LogInformation($"Entering {nameof(CreateUser)} method");
+      _logger.LogInformation($"Entering {nameof(CreateUser)} method*/");
+
       try
       {
         if (IsEmailUnique(userCreateDto.Email!))
         {
           _logger.LogWarning("User was not created. {Email} has already taken.", userCreateDto.Email);
-          _logger.LogInformation($"Exiting {nameof(CreateUser)} method\n");
+          _logger.LogInformation($"Exiting {nameof(CreateUser)} method");
           return BadRequest($"{userCreateDto.Email} has already taken");
         }
 
         if (!IsAgePositiveNumber(userCreateDto.Age))
         {
           _logger.LogWarning("User was not created. Age must be than 0.");
-          _logger.LogInformation($"Exiting {nameof(CreateUser)} method\n");
+          _logger.LogInformation($"Exiting {nameof(CreateUser)} method");
           return BadRequest($"Age must be than 0");
         }
 
@@ -236,11 +237,11 @@ namespace UserServiceAPI.Controller
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("User has created");
-        _logger.LogInformation($"Exiting {nameof(CreateUser)} method\n");
+        _logger.LogInformation("User was created");
+        _logger.LogInformation($"Exiting {nameof(CreateUser)} method");
         return CreatedAtRoute($"GetUser", new { userId = user.Id }, userCreateDto);
       }
-      catch (DbException)
+      catch (Exception)
       {
         return StatusCode(500, "Internal server error.");
       }
@@ -267,13 +268,14 @@ namespace UserServiceAPI.Controller
     [HttpPost("EditUser", Name = "EditUser")]
     public async Task<IActionResult> EditUser([FromBody] UserEditDto userEditDto)
     {
-      _logger.LogInformation($"Request: {HttpContext.Request.Path}. Entering {nameof(EditUser)} method");
+      _logger.LogInformation($"Entering {nameof(EditUser)} method");
+
       try
       {
         if (!IsUserExist(userEditDto.Id))
         {
           _logger.LogWarning("User was not edited. User with ID: {userId} not found", userEditDto.Id);
-          _logger.LogInformation($"Exiting {nameof(EditUser)} method\n");
+          _logger.LogInformation($"Exiting {nameof(EditUser)} method");
           return NotFound($"User with ID: {userEditDto.Id} not found");
         }
 
@@ -288,14 +290,14 @@ namespace UserServiceAPI.Controller
               && IsEmailUnique(userEditDto.Email!))
         {
           _logger.LogWarning("User was not edited. {Email} has already taken.", userEditDto.Email);
-          _logger.LogInformation($"Exiting {nameof(EditUser)} method\n");
+          _logger.LogInformation($"Exiting {nameof(EditUser)} method");
           return BadRequest($"{userEditDto.Email} has already taken");
         }
 
         if (!IsAgePositiveNumber(userEditDto.Age))
         {
           _logger.LogWarning("User was not updated. Age must be than 0.");
-          _logger.LogInformation($"Exiting {nameof(EditUser)} method\n");
+          _logger.LogInformation($"Exiting {nameof(EditUser)} method");
           return BadRequest($"Age must be than 0");
         }
 
@@ -304,7 +306,7 @@ namespace UserServiceAPI.Controller
         await _context.SaveChangesAsync();
         return Ok("User was edited");
       }
-      catch (DbException)
+      catch (Exception)
       {
         return StatusCode(500, "Internal server error");
       }
@@ -335,19 +337,20 @@ namespace UserServiceAPI.Controller
     public async Task<IActionResult> ChangeUserRoles([FromBody] List<string> userRoleNames, int userId)
     {
       _logger.LogInformation($"Entering {nameof(ChangeUserRoles)} method");
+
       try
       {
         if (!IsUserExist(userId))
         {
           _logger.LogInformation("User with ID: {userId} not found", userId);
-          _logger.LogInformation($"Exiting {nameof(ChangeUserRoles)} method\n");
+          _logger.LogInformation($"Exiting {nameof(ChangeUserRoles)} method");
           return NotFound($"User with ID: {userId} not found");
         }
 
         if (userRoleNames.Count == 0)
         {
           _logger.LogWarning("No roles were provided for addition");
-          _logger.LogInformation($"Exiting {nameof(ChangeUserRoles)} method\n");
+          _logger.LogInformation($"Exiting {nameof(ChangeUserRoles)} method");
           return BadRequest($"No roles were provided for addition.");
         }
 
@@ -364,7 +367,7 @@ namespace UserServiceAPI.Controller
           if (!IsRoleExist(roleName))
           {
             _logger.LogWarning("Role with Name: {roleName} has not existed", roleName);
-            _logger.LogInformation($"Exiting {nameof(ChangeUserRoles)} method\n");
+            _logger.LogInformation($"Exiting {nameof(ChangeUserRoles)} method");
             return BadRequest($"Role with Name: {roleName} has not existed");
           }
           // add role to User
@@ -396,10 +399,10 @@ namespace UserServiceAPI.Controller
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Role(s) was(were) changed");
-        _logger.LogInformation($"Exiting {nameof(ChangeUserRoles)} method\n");
+        _logger.LogInformation($"Exiting {nameof(ChangeUserRoles)} method");
         return Ok($"Role(s) was(were) changed");
       }
-      catch (DbException)
+      catch (Exception)
       {
         return StatusCode(500, "Internal server error");
       }
@@ -417,12 +420,13 @@ namespace UserServiceAPI.Controller
     public async Task<IActionResult> DeleteUser(int userId)
     {
       _logger.LogInformation($"Entering {nameof(DeleteUser)} method");
+
       try
       {
         if (!IsUserExist(userId))
         {
           _logger.LogWarning("User with ID: {userId} not found", userId);
-          _logger.LogInformation($"Exiting {nameof(DeleteUser)} method\n");
+          _logger.LogInformation($"Exiting {nameof(DeleteUser)} method");
           return NotFound($"User with ID: {userId} not found");
         }
 
@@ -435,10 +439,10 @@ namespace UserServiceAPI.Controller
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("User with ID: {userId} was deleted", userId);
-        _logger.LogInformation($"Exiting {nameof(DeleteUser)} method\n");
+        _logger.LogInformation($"Exiting {nameof(DeleteUser)} method");
         return NoContent();
       }
-      catch (DbException)
+      catch (Exception)
       {
         return StatusCode(500, "Internal server error");
       }
@@ -476,7 +480,7 @@ namespace UserServiceAPI.Controller
                         .Where(ur => ur.UserId == userId)
                         .Select(ur => ur.Role!.RoleName)
                         .ToList();
-      return useRoles;
+      return useRoles!;
     }
 
     /// <summary>
@@ -500,7 +504,7 @@ namespace UserServiceAPI.Controller
     }
 
     /// <summary>
-    /// 
+    /// Filters the list of users
     /// </summary>
     /// <param name="items"></param>
     /// <param name="userFilterDto"></param>
@@ -563,43 +567,34 @@ namespace UserServiceAPI.Controller
       {
         item.Roles = item.Roles.OrderBy(i =>
         {
-          var roleIndex = userAccessLevelList.IndexOf(i.RoleName);
+          var roleIndex = userAccessLevelList.IndexOf(i.RoleName!);
           return roleIndex != -1 ? roleIndex : int.MaxValue;
         }).ToList();
       }
       // Users are sorted by role based on the access level of the user role.
       // Example: user has roles [User, Admin, SuperAdmin]. When sorting a user,
       // the SuperAdmin role will be used, because its has the highest access level from the list
-      switch (sortOrder.ToLower())
+      return sortOrder.ToLower() switch
       {
-        case "nameasc":
-          return items.OrderBy(u => u.Name)
-            .ToList();
-        case "namedesc":
-          return items.OrderByDescending(u => u.Name)
-            .ToList();
-        case "ageasc":
-          return items.OrderBy(u => u.Age)
-            .ToList();
-        case "agedesc":
-          return items.OrderByDescending(u => u.Age)
-            .ToList();
-        case "emailasc":
-          return items.OrderBy(u => u.Email)
-            .ToList();
-        case "emaildesc":
-          return items.OrderByDescending(u => u.Email)
-            .ToList();
-        case "roleasc":
-          return items.OrderBy(u => u.Roles.FirstOrDefault())
-            .ToList();
-        case "roledesc":
-          return items.OrderByDescending(u => u.Roles.FirstOrDefault())
-            .ToList();
-        default:
-          return items.OrderBy(u => u.Id)
-            .ToList();
-      }
+        "nameasc" => items.OrderBy(u => u.Name)
+                    .ToList(),
+        "namedesc" => items.OrderByDescending(u => u.Name)
+                    .ToList(),
+        "ageasc" => items.OrderBy(u => u.Age)
+                    .ToList(),
+        "agedesc" => items.OrderByDescending(u => u.Age)
+                    .ToList(),
+        "emailasc" => items.OrderBy(u => u.Email)
+                    .ToList(),
+        "emaildesc" => items.OrderByDescending(u => u.Email)
+                    .ToList(),
+        "roleasc" => items.OrderBy(u => u.Roles.FirstOrDefault())
+                    .ToList(),
+        "roledesc" => items.OrderByDescending(u => u.Roles.FirstOrDefault())
+                    .ToList(),
+        _ => items.OrderBy(u => u.Id)
+                    .ToList(),
+      };
     }
   }
 }

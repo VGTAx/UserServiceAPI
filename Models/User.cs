@@ -19,33 +19,36 @@ namespace UserServiceAPI.Models
     /// </summary> 
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }    
+    public int Id { get; set; }  
+    
     /// <summary>
     /// User name
     /// </summary>
     [Required]
     public string? Name { get; set; } 
+
     /// <summary>
     /// User age
     /// </summary>
     [Required]
     public int Age { get; set; }
+
     /// <summary>
     /// User email
     /// </summary>
     [Required]
     [EmailAddress]
     public string? Email { get; set; }
+
     /// <summary>
-    /// User email
+    /// User roles
     /// </summary> 
     public List<Role> Roles { get; set; } = new List<Role>();
+
     /// <summary>
     /// Navigation property
     /// </summary>
     [JsonIgnore]
-    public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
-
-    
+    public List<UserRole> UserRoles { get; set; } = new List<UserRole>();    
   }
 }

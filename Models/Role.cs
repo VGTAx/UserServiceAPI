@@ -8,7 +8,7 @@ namespace UserServiceAPI.Models
   /// <summary>
   /// Represent a role
   /// </summary>
-  public class Role : IComparable<Role>
+  public class Role : IComparable<Role>, IEquatable<Role?>
   { 
     /// <summary>
     /// Role Id
@@ -16,24 +16,38 @@ namespace UserServiceAPI.Models
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
+
     /// <summary>
     /// Role name
     /// </summary>
     [Required]
     public string? RoleName { get; set; }
+
     /// <summary>
     /// Navigation property
     /// </summary>
     [JsonIgnore]
     public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
+
+    public override bool Equals(object? obj)
+    {
+      return Equals(obj as Role);
+    }
+
+    public bool Equals(Role? other)
+    {
+      return other is not null &&
+             RoleName == other.RoleName;
+    }
+
+    public override int GetHashCode()
+    {
+      return HashCode.Combine(RoleName);
+    }
+
     int IComparable<Role>.CompareTo(Role? other)
     {
       return Id.CompareTo(other?.Id);
-    }
+    }    
   }
 }

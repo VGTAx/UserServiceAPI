@@ -9,12 +9,14 @@
     /// Users data
     /// </summary>
     public List<User> Users { get; set; }
+
     /// <summary>
     /// Contains pagination information
     /// </summary>
     public PaginationInfo Pages { get; set; }
 
     public UsersPaginationData () { }
+
     /// <summary>
     /// GetUserAndPaginationData constructor
     /// </summary>
