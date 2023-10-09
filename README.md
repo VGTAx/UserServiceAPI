@@ -7,9 +7,8 @@
   <li>Документация API с использованием Swagger.</li>
   <li>Логирование действий API с использованием Serilog.</li> 
 </ol>
-<a href="#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B-api">Методы API:</a>
 <details>
-<summary><h4><a name="методы-api">Методы API:</a></h4></summary>
+<summary><h4><a href="#методы-api">Методы API:</a></h4></summary>
 <ol>
   <li><b>Получение списка всех пользователей:</b>
       <ul>
