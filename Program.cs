@@ -17,6 +17,7 @@ builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddLogging(loggingBuilder =>
 {
   loggingBuilder.ClearProviders();
+  loggingBuilder.AddSerilog();
 });
 
 Log.Logger = new LoggerConfiguration()
@@ -43,13 +44,11 @@ try
 {
   var app = builder.Build();
 
-  Log.Information("Application built and starting...");
-  // Configure the HTTP request pipeline.
-  if (app.Environment.IsDevelopment())
-  {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-  }
+  Log.Information("Application built and starting..."); 
+  
+  app.UseSwagger();
+  app.UseSwaggerUI();
+
   app.UseCors();
 
   app.UseHttpsRedirection();
