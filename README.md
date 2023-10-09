@@ -48,7 +48,7 @@
   <li><b>Изменение ролей пользователя:</b>
       <ul>
         <li>HTTP метод:  DELETE</li>
-        <li>Путь: /api/UserService/ChangeUserRoles</li>
+        <li>Путь: /api/UserService/DeleteUser</li>
         <li>Описание: Метод позволяет удалить пользователя по его уникальному идентификатору (Id).</li>
       </ul>
   </li>  
