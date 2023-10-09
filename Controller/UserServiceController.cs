@@ -72,7 +72,7 @@ namespace UserServiceAPI.Controller
     /// </response> 
     /// <response code="500">Internal server error.</response> 
     /// <returns>Returns an HTTP status code indicating the result of the get users method.</returns>
-    [HttpGet("GetUsers", Name = "GetUsers")]
+    [HttpGet(nameof(GetUsers), Name = nameof(GetUsers))]
     public async Task<IActionResult> GetUsers([FromQuery] UserFilterDto userFilterDto, string userRoleName = "", int page = 1, int pageSize = 10, string sortOrder = "IdAsc")
     {
       _logger.LogInformation($"Entering {nameof(GetUsers)} method");
@@ -158,7 +158,7 @@ namespace UserServiceAPI.Controller
     /// <response code="404">User was not found.</response>
     /// <response code="500">Internal server error</response>
     /// <returns>Returns an HTTP status code indicating the result of the get user method.</returns>    
-    [HttpGet("GetUser/{userId}", Name = "GetUser")]
+    [HttpGet($"{nameof(GetUser)}"+"/{userId}", Name = nameof(GetUser))]
     public IActionResult GetUser(int userId)
     {
       _logger.LogInformation($"Entering {nameof(GetUser)} method");
@@ -211,7 +211,7 @@ namespace UserServiceAPI.Controller
     /// </response>
     /// <response code="500">Internal server error</response>
     /// <returns>Returns an HTTP status code indicating the result of the create user method.</returns>
-    [HttpPost("CreateUser", Name = "CreateUser")]
+    [HttpPost(nameof(CreateUser), Name = nameof(CreateUser))]
     public async Task<IActionResult> CreateUser([FromBody] UserCreateDto userCreateDto)
     {
       _logger.LogInformation($"Entering {nameof(CreateUser)} method*/");
@@ -265,7 +265,7 @@ namespace UserServiceAPI.Controller
     /// <param name="userEditDto" example='{"id": 10, "name":"Jeff Bezos", "age":59, "email":"j.bezos@amazon.com"}'>
     /// DTO with updated user data.</param>
     /// <returns>Returns an HTTP status code indicating the result of the edit user method.</returns>
-    [HttpPost("EditUser", Name = "EditUser")]
+    [HttpPost(nameof(EditUser), Name = nameof(EditUser))]
     public async Task<IActionResult> EditUser([FromBody] UserEditDto userEditDto)
     {
       _logger.LogInformation($"Entering {nameof(EditUser)} method");
@@ -333,7 +333,7 @@ namespace UserServiceAPI.Controller
     /// </response>
     /// <response code="500">Internal server error</response>
     /// <returns>Returns an HTTP status code indicating the result of the user change role(s) method.</returns>
-    [HttpPost("ChangedUserRoles", Name = "ChangedUserRoles")]
+    [HttpPost(nameof(ChangeUserRoles), Name = nameof(ChangeUserRoles))]
     public async Task<IActionResult> ChangeUserRoles([FromBody] List<string> userRoleNames, int userId)
     {
       _logger.LogInformation($"Entering {nameof(ChangeUserRoles)} method");
@@ -416,7 +416,7 @@ namespace UserServiceAPI.Controller
     /// <response code="404">User was not found.</response>
     /// <response code="500">Internal server error</response>
     /// <returns>Returns an HTTP status code indicating the result of the delete user method.</returns>
-    [HttpDelete("DeleteUser/{userId}", Name = "DeleteUser")]
+    [HttpDelete($"{nameof(DeleteUser)}" + "/{userId}", Name = nameof(DeleteUser))]
     public async Task<IActionResult> DeleteUser(int userId)
     {
       _logger.LogInformation($"Entering {nameof(DeleteUser)} method");
