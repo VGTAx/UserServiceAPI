@@ -7,7 +7,7 @@
   <li>Документация API с использованием Swagger.</li>
   <li>Логирование действий API с использованием Serilog.</li> 
 </ol>
-<a href="https://github.com/VGTAx/UserServiceAPI#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B-api">Методы API:</a>
+<a href="#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B-api">Методы API:</a>
 <details>
 <summary><h4><a name="методы-api">Методы API:</a></h4></summary>
 <ol>
